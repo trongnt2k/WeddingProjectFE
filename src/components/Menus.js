@@ -3,6 +3,7 @@ import { Container, Row , Col, CardImg, Button, Card, Form, Pagination} from "re
 import APIS, { endpoints } from "../configs/APIS"
 import CurrencyFormat from 'react-currency-format';
 import { useHistory, useLocation } from "react-router";
+import { Link } from "react-router-dom";
 
 export default function Menus(){
     let [menus, setMenus] = useState([])
@@ -76,6 +77,7 @@ export default function Menus(){
 }
 
 function Amenu(props){
+    let pathMenuDetail = `/menus/${props.menu.id}/dishes-and-drink/`
     return(
         <Col md={4}>
             <Card style={{ width: '18rem' }}>
@@ -88,7 +90,7 @@ function Amenu(props){
                     thousandSeparator={true} 
                     prefix={'₫'}/>
                     </Card.Text>
-                    <Button variant="primary" onClick={()=>{window.location.href=`/menus/${props.menu.id}/dishes-and-drink/`}}>Chi tiết</Button>
+                    <Button variant="primary" as={Link} to={pathMenuDetail}>Chi tiết</Button>
                 </Card.Body>
             </Card>
         </Col>

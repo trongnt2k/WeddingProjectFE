@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import moment from "moment";
 import { useHistory, useLocation } from "react-router";
 import CurrencyFormat from 'react-currency-format';
+import { Link } from "react-router-dom";
 
 export default function Weddings(){
     let [weddings, setWeddings] = useState([])
@@ -117,7 +118,7 @@ function Awedding(props){
                     thousandSeparator={true} 
                     prefix={'₫'}/>
                     </Card.Text>
-                    <Card.Text><Button variant="primary" href={pathWeddingDetail}>Chi tiết</Button></Card.Text>
+                    <Card.Text><Button variant="primary" as={Link} to={pathWeddingDetail}>Chi tiết</Button></Card.Text>
                 </Card.Body>
             </Card>
         </Col>

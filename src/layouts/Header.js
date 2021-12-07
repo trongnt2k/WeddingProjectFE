@@ -2,14 +2,15 @@ import {Container , Nav, Navbar} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Badge } from 'reactstrap';
 import Cookies from "js-cookie";
+import {Link} from 'react-router-dom'
 
 export default function Header(){
     let path=""
     let userProfilePath=`/users/${localStorage.getItem('user_id')}/`
     if(localStorage.getItem('username') === null)
-        path = <Nav.Link href="/login" className="text-danger">Đăng nhập</Nav.Link>
+        path = <Nav.Link as={Link} to="/login" className="text-danger">Đăng nhập</Nav.Link>
     else
-        path = <Nav.Link href={userProfilePath} className="text-danger">{localStorage.getItem('username')}</Nav.Link>
+        path = <Nav.Link as={Link} to={userProfilePath} className="text-danger">{localStorage.getItem('username')}</Nav.Link>
     let count = 0
     if(!!sessionStorage.getItem("count"))
         count += parseInt(sessionStorage.getItem("count"))
@@ -28,13 +29,13 @@ export default function Header(){
                     style={{ maxHeight: '100px' }}
                     navbarScroll
                     >
-                        <Nav.Link href="/weddings">Tiệc Cưới</Nav.Link>
-                        <Nav.Link href="/weddinghalls">Sảnh cưới</Nav.Link>
-                        <Nav.Link href="/services">Dịch vụ cưới</Nav.Link>
-                        <Nav.Link href="/menus">Thực đơn cưới</Nav.Link>
-                        <Nav.Link href="/register">Đăng kí</Nav.Link>
+                        <Nav.Link as={Link} to="/weddings">Tiệc Cưới</Nav.Link>
+                        <Nav.Link as={Link} to="/weddinghalls">Sảnh cưới</Nav.Link>
+                        <Nav.Link as={Link} to="/services">Dịch vụ cưới</Nav.Link>
+                        <Nav.Link as={Link} to="/menus">Thực đơn cưới</Nav.Link>
+                        <Nav.Link as={Link} to="/register">Đăng kí</Nav.Link>
                         {path}
-                        <Nav.Link href="/weddings/create-wedding">Đặt tiệc <Badge 
+                        <Nav.Link as={Link} to="/weddings/create-wedding">Đặt tiệc <Badge 
                             className="text-white bg-danger">{count}
                             </Badge>
                         </Nav.Link>

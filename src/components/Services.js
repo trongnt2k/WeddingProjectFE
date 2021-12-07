@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button, Pagination, Form} from "react-bootst
 import APIS, { endpoints } from "../configs/APIS"
 import CurrencyFormat from 'react-currency-format';
 import { useHistory, useLocation } from "react-router";
+import { Link } from "react-router-dom";
 
 export default function Services() {
     let [services, setServices] = useState([])
@@ -79,6 +80,7 @@ export default function Services() {
 }
 
 function Aservice(props){
+    let pathServiceDetail = `/services/${props.service.id}/`
     return(
         <Col md={4}>
             <Card style={{ width: '18rem' }}>
@@ -91,7 +93,7 @@ function Aservice(props){
                     thousandSeparator={true} 
                     prefix={'₫'}/>
                     </Card.Text>
-                    <Button variant="primary" onClick={()=>{window.location.href=`/services/${props.service.id}/`}}>Chi tiết</Button>
+                    <Button variant="primary" as={Link} to={pathServiceDetail}>Chi tiết</Button>
                 </Card.Body>
             </Card>
         </Col>

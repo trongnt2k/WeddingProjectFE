@@ -4,6 +4,7 @@ import { Container , Row, Card, Col, Button, Form, Pagination} from "react-boots
 import APIS, { endpoints } from "../configs/APIS"
 import CurrencyFormat from 'react-currency-format';
 import { useHistory, useLocation } from "react-router";
+import { Link } from "react-router-dom";
 
 
 export default function WeddingHalls(){
@@ -97,6 +98,7 @@ export default function WeddingHalls(){
 }
 
 function AWeddinghall(props){
+    let pathWeddingHallsDetail = `/weddinghalls/${props.weddinghall.id}/`
     return(
         <Col md={4}>
             <Card style={{ width: '18rem' }}>
@@ -111,7 +113,7 @@ function AWeddinghall(props){
                     thousandSeparator={true} 
                     prefix={'₫'}/>
                     </Card.Text>
-                    <Button variant="primary" onClick={()=>{window.location.href=`/weddinghalls/${props.weddinghall.id}/`}}>Chi tiết</Button>
+                    <Button variant="primary" as={Link} to={pathWeddingHallsDetail}>Chi tiết</Button>
                 </Card.Body>
             </Card>
         </Col>
