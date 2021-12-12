@@ -1,14 +1,57 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { ListGroup , Row, Col, Container, Image, Button} from "react-bootstrap"
 import { useParams } from "react-router"
 import APIS, { endpoints } from "../configs/APIS"
 import CurrencyFormat from 'react-currency-format';
 import swal from "sweetalert";
-import Cookies from "js-cookie";
+import CartContext from "../CartProvider/CartContext";
+import { addWeddingHallToCart } from "../reducers/actions";
+import _ from 'lodash';
 
 export default function WeddingHallDetail(){
     let [weddinghall, setWeddingHall] = useState([])
     let { weddinghallId } = useParams()
+    const [state, dispatch] = useContext(CartContext)
+    const weddinghallObj = {
+        weddinghall_id: weddinghall.id,
+        weddinghall_name: weddinghall.name,
+        weddinghall_price: weddinghall.wedding_hall_price,
+        weddinghall_image: weddinghall.wedding_hall_images
+    }
+    const rentWeddinghall = () => {
+        if(!!localStorage.getItem("access_token")){
+            if(_.isEmpty(state.weddingHall)){
+                dispatch(addWeddingHallToCart(weddinghallObj))
+                swal({
+                    title: `Thuê sảnh ${weddinghall.name}!`,
+                    text: "Thành công!",
+                    icon: "success",
+                    button: "Đồng ý",
+                })
+            }
+            else if(_.isEqual(state.weddingHall, weddinghallObj)){
+                swal({
+                    title: `Đã thuê sảnh này !`,
+                    text: "Thất bại!",
+                    icon: "warning",
+                    button: "Đồng ý",
+                })
+            }
+            else{
+                dispatch(addWeddingHallToCart(weddinghallObj))
+                swal({
+                    title: `Đổi sảnh thuê ${weddinghall.name} thành công !`,
+                    text: "Thành công!",
+                    icon: "success",
+                    button: "Đồng ý",
+                })
+            }
+        }
+        else{
+            if(window.confirm("Đăng nhập để thực hiện thuê sảnh cưới ?") === true)
+                window.location.href= "/login"
+        }
+    }
 
     useEffect( async() => {
         try{
@@ -18,25 +61,7 @@ export default function WeddingHallDetail(){
             console.error(ex)
         }
     }, [])
-    const rentWeddinghall = () => {
-        if(!!localStorage.getItem("access_token")){
-            Cookies.set("weddinghall_id", weddinghall.id)
-            Cookies.set("weddinghall_name", weddinghall.name)
-            Cookies.set("weddinghall_price", weddinghall.wedding_hall_price)
-            Cookies.set("weddinghall_image", weddinghall.wedding_hall_images)
-            swal({
-                title: `Thuê sảnh ${weddinghall.name}!`,
-                text: "Thành công!",
-                icon: "success",
-                button: "Đồng ý",
-            }).then(function(){
-                window.location.reload()
-            })
-        }
-        else
-            if(window.confirm("Đăng nhập để thực hiện thuê sảnh cưới ?") == true)
-                window.location.href= "/login"
-    }
+
     return(
         <Container>
             <Row>

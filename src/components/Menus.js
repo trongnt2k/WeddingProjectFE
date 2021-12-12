@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Container, Row , Col, CardImg, Button, Card, Form, Pagination} from "react-bootstrap"
+import { Container, Row , Col, Button, Card, Form, Pagination} from "react-bootstrap"
 import APIS, { endpoints } from "../configs/APIS"
 import CurrencyFormat from 'react-currency-format';
 import { useHistory, useLocation } from "react-router";

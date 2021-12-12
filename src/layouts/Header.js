@@ -1,8 +1,9 @@
 import {Container , Nav, Navbar} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Badge } from 'reactstrap';
-import Cookies from "js-cookie";
 import {Link} from 'react-router-dom'
+import { useContext } from "react";
+import CartContext from "../CartProvider/CartContext";
 
 export default function Header(){
     let path=""
@@ -11,13 +12,7 @@ export default function Header(){
         path = <Nav.Link as={Link} to="/login" className="text-danger">Đăng nhập</Nav.Link>
     else
         path = <Nav.Link as={Link} to={userProfilePath} className="text-danger">{localStorage.getItem('username')}</Nav.Link>
-    let count = 0
-    if(!!sessionStorage.getItem("count"))
-        count += parseInt(sessionStorage.getItem("count"))
-    if(!!Cookies.get("weddinghall_id"))
-        count = count+1
-    if(!!Cookies.get("menu_id"))
-        count = count+1
+    const [state] = useContext(CartContext)
     return(
         <Container>
             <Navbar bg="dark" variant="dark">
@@ -36,7 +31,7 @@ export default function Header(){
                         <Nav.Link as={Link} to="/register">Đăng kí</Nav.Link>
                         {path}
                         <Nav.Link as={Link} to="/weddings/create-wedding">Đặt tiệc <Badge 
-                            className="text-white bg-danger">{count}
+                            className="text-white bg-danger">{localStorage.getItem("count") || state.count}
                             </Badge>
                         </Nav.Link>
                     </Nav>

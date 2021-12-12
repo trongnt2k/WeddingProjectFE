@@ -1,14 +1,47 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { ListGroup , Row, Col, Container, Image, Button} from "react-bootstrap"
 import { useParams } from "react-router"
 import APIS, { endpoints } from "../configs/APIS"
 import CurrencyFormat from 'react-currency-format';
 import swal from "sweetalert";
+import CartContext from "../CartProvider/CartContext";
+import { addServiceToCart } from "../reducers/actions";
 
 export default function ServiceDetail(){
     let [service, setService] = useState([])
     let { serviceId } = useParams()
-
+    const [state, dispatch] = useContext(CartContext)
+    const serviceObj = {
+        service_id: service.id,
+        service_name: service.name,
+        service_price: service.price,
+        service_image: service.service_images
+    }
+    const rentServices = () => {
+        if(!!localStorage.getItem("access_token")){
+            if(!state.services.some(service => { return service.service_id === serviceObj.service_id })){
+                dispatch(addServiceToCart(serviceObj))
+                swal({
+                    title: `Thuê dịch vụ ${service.name}!`,
+                    text: "Thành công!",
+                    icon: "success",
+                    button: "Đồng ý",
+                })
+            }
+            else{
+                swal({
+                    title: `Đã thuê dịch vụ này !`,
+                    text: "Thất bại!",
+                    icon: "warning",
+                    button: "Đồng ý",
+                })
+            }
+        }
+        else{
+            if(window.confirm("Đăng nhập để thực hiện thuê sảnh cưới ?") === true)
+                window.location.href= "/login"
+        }
+    }
     useEffect( async() => {
         try{
             let res = await APIS.get(endpoints['serviceDetail'](serviceId))
@@ -17,57 +50,7 @@ export default function ServiceDetail(){
             console.error(ex)
         }
     }, [])
-    const rentServices = () => {
-        let servicesId = []
-        let count = 0
-        if(!!sessionStorage.getItem("count"))
-            count = sessionStorage.getItem("count")
-        for(let i=0; i<count ; i++){
-            servicesId.push(sessionStorage.getItem(`service_${i+1}`))
-        }
-        console.info(servicesId)
-        if(!!localStorage.getItem("access_token")){
-            if((servicesId.includes(`${service.id}`) == false) && (count<10)){
-                count++
-                sessionStorage.setItem(`service_${count}`, service.id)
-                sessionStorage.setItem(`service_${count}_name`, service.name)
-                sessionStorage.setItem(`service_${count}_price`, service.price)
-                sessionStorage.setItem(`service_${count}_service_images`, service.service_images)
-                sessionStorage.setItem("count", count)
-                swal({
-                    title: `Thuê dịch vụ ${service.name}!`,
-                    text: "Thành công!",
-                    icon: "success",
-                    button: "Đồng ý",
-                }).then(function(){
-                    window.location.reload()
-                })
-            }
-            else{
-                if(servicesId.includes(`${service.id}`) == true)
-                {
-                    swal({
-                        title: "Dịch vụ đã thuê!",
-                        text: "Chọn dịch vụ khác!",
-                        icon: "warning",
-                        button: "Đồng ý",
-                    })
-                }
-                if(count>10)
-                {
-                    swal({
-                        title: "Lỗi!",
-                        text: "Không được thuê quá 10 dịch vụ cho tiệc cưới!",
-                        icon: "warning",
-                        button: "Đồng ý",
-                    })
-                }
-            }
-        }
-        else
-            if(window.confirm("Đăng nhập để thực hiện thuê dịch vụ ?") == true)
-                window.location.href= "/login"
-    }
+
     return(
         <Container>
             <Row>

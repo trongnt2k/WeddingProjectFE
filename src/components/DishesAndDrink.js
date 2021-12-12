@@ -1,16 +1,59 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { useParams } from "react-router"
 import APIS, { endpoints } from "../configs/APIS"
 import { Container, Row , Col, Card, Button} from "react-bootstrap"
 import CurrencyFormat from 'react-currency-format';
 import swal from "sweetalert";
-import Cookies from "js-cookie";
+import _ from 'lodash';
+import CartContext from "../CartProvider/CartContext";
+import { addMenuToCart } from "../reducers/actions";
 
 export default function DishesAndDrink(){
     let [dishesanddrink, setDishesanddrink] = useState([])
-    let [menuDetail, setMenuDetail] = useState()
+    let [menuDetail, setMenuDetail] = useState([])
     let [menuPrice, setMenuPrice] = useState()
     let  { menuId } = useParams()
+    const [state, dispatch] = useContext(CartContext)
+    const menuObj = {
+        menu_id: menuDetail.id,
+        menu_name: menuDetail.name,
+        menu_price: menuDetail.total_money,
+        menu_image: menuDetail.menu_images
+    }
+
+        const bookMenu = () => {
+            if(!!localStorage.getItem("access_token")){
+                if(_.isEmpty(state.menu)){
+                    dispatch(addMenuToCart(menuObj))
+                    swal({
+                        title: `Đặt thưc đơn ${menuDetail.name}!`,
+                        text: "Thành công!",
+                        icon: "success",
+                        button: "Đồng ý",
+                    })
+                }else if(_.isEqual(state.menu, menuObj)){
+                    swal({
+                        title: `Đã đặt thực đơn này !`,
+                        text: "Thất bại!",
+                        icon: "warning",
+                        button: "Đồng ý",
+                    })
+                }
+                else{
+                    dispatch(addMenuToCart(menuObj))
+                    swal({
+                        title: `Đổi thực đơn ${menuDetail.name} thành công !`,
+                        text: "Thành công!",
+                        icon: "success",
+                        button: "Đồng ý",
+                    })
+                }
+            }
+            else{
+                if(window.confirm("Đăng nhập để thực hiện đặt thực đơn ?") === true)
+                    window.location.href= "/login"
+            }
+        }
 
     useEffect( async () => {
         try{
@@ -25,26 +68,6 @@ export default function DishesAndDrink(){
             console.error(ex)
         }
     }, [])
-
-    const bookMenu = () => {
-        if(!!localStorage.getItem("access_token")){
-            Cookies.set("menu_id", menuDetail.id)
-            Cookies.set("menu_name", menuDetail.name)
-            Cookies.set("menu_price", menuDetail.total_money)
-            Cookies.set("menu_image", menuDetail.menu_images)
-            swal({
-                title: `Đặt thực đơn ${menuDetail.name}!`,
-                text: "Thành công!",
-                icon: "success",
-                button: "Đồng ý",
-            }).then(function(){
-                window.location.reload()
-            })
-        }
-        else
-            if(window.confirm("Đăng nhập để thực hiện đặt menu ?") == true)
-                window.location.href= "/login"
-    }
 
     return(
         <Container>

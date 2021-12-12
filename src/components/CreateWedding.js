@@ -1,142 +1,71 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { Container , Col, Row, Button ,Form, Card} from "react-bootstrap"
 import APIS, { endpoints } from "../configs/APIS"
-import { Link } from "react-router-dom"
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"
-import Cookies from "js-cookie";
 import moment from "moment";
 import CurrencyFormat from 'react-currency-format';
 import swal from "sweetalert";
+import CartContext from "../CartProvider/CartContext";
+import { delMenuCartItem, delServiceCartItem, delWeddingHallCartItem } from "../reducers/actions";
 
 export default function CreateWedding(){
     let [description, setDescription] = useState("")
     let [desk, setDesk] = useState(1)
     let [date, setDate] = useState("")
-    let count = 0
-    let services =[]
-    let servicesId =[]
-    let menuId = ""
+    const [dispatch] = useContext(CartContext)
+    let totalPrice = 0;
     let weddinghallId = ""
-    let servicePrice = 0
-    let weddinghallPrice = 0
-    let menuPrice = 0
-    if(!!Cookies.get("menu_id"))
-        menuId = Cookies.get("menu_id")
-    if(!!Cookies.get("weddinghall_id"))
-        weddinghallId = Cookies.get("weddinghall_id")
-    if(!!Cookies.get("weddinghall_price"))
-        weddinghallPrice = parseInt(Cookies.get("weddinghall_price"))
-    if(!!Cookies.get("menu_price"))
-        menuPrice = parseInt(Cookies.get("menu_price")) * desk
-    if(!!sessionStorage.getItem("count"))
-        count = sessionStorage.getItem("count")
-    if(count!=0)
-    {
-        services.push(<h2 className="text-danger">Dịch vụ thuê</h2>)
-        for(let i=1; i<=10; i++){
-            if(!!sessionStorage.getItem(`service_${i}`))
-            {
-                servicesId.push(sessionStorage.getItem(`service_${i}`))
-                servicePrice += parseInt(`${sessionStorage.getItem(`service_${i}_price`)}`)
-                services.push(
-                    <Col>
-                        <Card style={{ width: '18rem' }}>
-                            <Card.Img variant="top" src={sessionStorage.getItem(`service_${i}_service_images`)} />
-                            <Card.Body>
-                                <Card.Title>{sessionStorage.getItem(`service_${i}_name`)}</Card.Title>
-                                <Card.Text className="text-danger">Giá : <CurrencyFormat 
-                                value={sessionStorage.getItem(`service_${i}_price`)}
-                                displayType={'text'} 
-                                thousandSeparator={true} 
-                                prefix={'₫'}/>
-                                </Card.Text>
-                                <Row>
-                                    <Col>
-                                        <Button 
-                                        variant="danger"
-                                        onClick={() => {
-                                            sessionStorage.removeItem(`service_${i}_service_images`)
-                                            sessionStorage.removeItem(`service_${i}_name`)
-                                            sessionStorage.removeItem(`service_${i}_price`)
-                                            sessionStorage.removeItem(`service_${i}`)
-                                            sessionStorage.setItem("count", count-1)
-                                            swal({
-                                                title: "Hủy thuê",
-                                                text: "Thành công!",
-                                                icon: "success",
-                                                button: "Đồng ý",
-                                            }).then(function(){
-                                                window.location.reload()
-                                            })
-                                        }}>Hủy thuê</Button>
-                                    </Col>
-                                    <Col>
-                                        <Button variant="primary" onClick={()=>{window.location.href=`/services/${sessionStorage.getItem(`service_${i}`)}`}}>Chi tiết</Button>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                )
-            }
-        }
-    }
-    
-    let weddinghallRent =[]
-    if(!!Cookies.get("weddinghall_id"))
-        {weddinghallRent.push(
+    let weddinghallRent = []
+    let menuId = ""
+    let menuRent = []
+    let services = []
+    let servicesId = []
+
+    if(localStorage.getItem("weddinghall")){
+        weddinghallId = JSON.parse(localStorage.getItem("weddinghall")).weddinghall_id
+        totalPrice += JSON.parse(localStorage.getItem("weddinghall")).weddinghall_price
+        weddinghallRent.push(
             <>
                 <h2 className="text-danger">Sảnh cưới thuê</h2>
-                <Card style={{ width: '18rem' }}>
-                    <Card.Img variant="top" src={Cookies.get("weddinghall_image")} />
+                    <Card style={{ width: '18rem' }}>
+                    <Card.Img variant="top" src={JSON.parse(localStorage.getItem("weddinghall")).weddinghall_image} />
                     <Card.Body>
-                        <Card.Title>{Cookies.get("weddinghall_name")}</Card.Title>
+                        <Card.Title>{JSON.parse(localStorage.getItem("weddinghall")).weddinghall_name}</Card.Title>
                         <Card.Text className="text-danger">Giá thuê: <CurrencyFormat 
-                        value={Cookies.get("weddinghall_price")}
-                        displayType={'text'} 
-                        thousandSeparator={true} 
-                        prefix={'₫'}/>
+                            value={JSON.parse(localStorage.getItem("weddinghall")).weddinghall_price}
+                            displayType={'text'} 
+                            thousandSeparator={true} 
+                            prefix={'₫'}/>
                         </Card.Text>
                         <Row>
                             <Col>
                                 <Button 
                                 variant="danger"
-                                onClick={() => {
-                                    Cookies.remove("weddinghall_id")
-                                    Cookies.remove("weddinghall_name")
-                                    Cookies.remove("weddinghall_price")
-                                    Cookies.remove("weddinghall_image")
-                                    swal({
-                                        title: "Hủy thuê",
-                                        text: "Thành công!",
-                                        icon: "success",
-                                        button: "Đồng ý",
-                                    }).then(function(){
-                                        window.location.reload()
-                                    })
-                                }}>Hủy thuê</Button>
+                                onClick={() => dispatch(delWeddingHallCartItem())}>Hủy thuê</Button>
                             </Col>
                             <Col>
-                                <Button variant="primary" onClick={()=>{window.location.href=`/weddinghalls/${Cookies.get("weddinghall_id")}`}}>Chi tiết</Button>
+                                <Button variant="primary" onClick={()=>{window.location.href=`/weddinghalls/${JSON.parse(localStorage.getItem("weddinghall")).weddinghall_id}`}}>Chi tiết</Button>
                             </Col>
                         </Row>
                     </Card.Body>
-                </Card>
+                    </Card>
             </>
-        )}
-    
-    let menuRent =[]
-    if(!!Cookies.get("menu_id"))
-        {menuRent.push(
+        )
+    }
+
+    if(localStorage.getItem("menu")){
+        menuId = JSON.parse(localStorage.getItem("menu")).menu_id
+        totalPrice += JSON.parse(localStorage.getItem("menu")).menu_price * desk
+        menuRent.push(
             <>
                 <h2 className="text-danger">Thực đơn đặt</h2>
                 <Card style={{ width: '18rem' }}>
-                    <Card.Img variant="top" src={Cookies.get("menu_image")} />
+                    <Card.Img variant="top" src={JSON.parse(localStorage.getItem("menu")).menu_image} />
                     <Card.Body>
-                        <Card.Title>{Cookies.get("menu_name")}</Card.Title>
+                        <Card.Title>{JSON.parse(localStorage.getItem("menu")).menu_name}</Card.Title>
                         <Card.Text className="text-danger">Giá : <CurrencyFormat 
-                        value={Cookies.get("menu_price")}
+                        value={JSON.parse(localStorage.getItem("menu")).menu_price}
                         displayType={'text'} 
                         thousandSeparator={true} 
                         prefix={'₫'}/>
@@ -145,32 +74,50 @@ export default function CreateWedding(){
                             <Col>
                                 <Button 
                                 variant="danger"
-                                onClick={() => {
-                                    Cookies.remove("menu_id")
-                                    Cookies.remove("menu_name")
-                                    Cookies.remove("menu_price")
-                                    Cookies.remove("menu_image")
-                                    swal({
-                                        title: "Hủy đặt",
-                                        text: "Thành công!",
-                                        icon: "success",
-                                        button: "Đồng ý",
-                                    }).then(function(){
-                                        window.location.reload()
-                                    })
-                                }}>Hủy đặt</Button>
+                                onClick={() => dispatch(delMenuCartItem())}>Hủy đặt</Button>
                             </Col>
                             <Col>
-                                <Button variant="primary" onClick={()=>{window.location.href=`/menus/${Cookies.get("menu_id")}/dishes-and-drink/`}}>Chi tiết</Button>
+                                <Button variant="primary" onClick={()=>{window.location.href=`/menus/${JSON.parse(localStorage.getItem("menu")).menu_id}/dishes-and-drink/`}}>Chi tiết</Button>
                             </Col>
                         </Row>
                     </Card.Body>
                 </Card>
             </>
-        )}
-        
+        )
+    }
+    if(localStorage.getItem("services")){
+        JSON.parse(localStorage.getItem("services")).forEach(service => servicesId.push(service.service_id))
+        JSON.parse(localStorage.getItem("services")).forEach(service => totalPrice += service.service_price)
+        services.push(<h2 className="text-danger">Dịch vụ thuê</h2>)
+        JSON.parse(localStorage.getItem("services")).forEach(service => services.push(
+            <Col>
+                <Card style={{ width: '18rem' }}>
+                    <Card.Img variant="top" src={service.service_image} />
+                    <Card.Body>
+                        <Card.Title>{service.service_name}</Card.Title>
+                        <Card.Text className="text-danger">Giá : <CurrencyFormat 
+                            value={service.service_price}
+                            displayType={'text'} 
+                            thousandSeparator={true} 
+                            prefix={'₫'}/>
+                        </Card.Text>
+                        <Row>
+                            <Col>
+                                <Button 
+                                    variant="danger"
+                                    onClick={() => {dispatch(delServiceCartItem(service.service_id))}}>Hủy thuê</Button>
+                            </Col>
+                            <Col>
+                                <Button variant="primary" onClick={()=>{window.location.href=`/services/${service.service_id}`}}>Chi tiết</Button>
+                            </Col>
+                        </Row>
+                    </Card.Body>
+                </Card>
+            </Col>
+        ))
+    }
     const payment = async() => {
-        if(window.confirm("Bạn đồng ý thanh toán ?") == true){
+        if(window.confirm("Bạn đồng ý thanh toán ?") === true){
             if(!!localStorage.getItem("access_token")){
                 if((!!desk) && (!!date) && (parseInt(moment(date).format("YYYY"))<2040 && parseInt(moment(date).format("YYYY"))>2020)){
                     try{
@@ -186,27 +133,20 @@ export default function CreateWedding(){
                                 "Authorization": `Bearer ${localStorage.getItem("access_token")}`
                             }
                         })
-                        sessionStorage.clear()
-                        if(!!Cookies.get("weddinghall_id"))
-                        {
-                            Cookies.remove("weddinghall_id")
-                            Cookies.remove("weddinghall_image")
-                            Cookies.remove("weddinghall_name")
-                            Cookies.remove("weddinghall_price")
-                        }
-                        if(!!Cookies.get("menu_id"))
-                        {
-                            Cookies.remove("menu_id")
-                            Cookies.remove("menu_image")
-                            Cookies.remove("menu_name")
-                            Cookies.remove("menu_price")
-                        }
+                        if(localStorage.getItem("weddinghall"))
+                            localStorage.removeItem("weddinghall")
+                        if(localStorage.getItem("menu"))
+                            localStorage.removeItem("menu")
+                        if(localStorage.getItem("services"))
+                            localStorage.removeItem("services")
+                        if(localStorage.getItem("count"))
+                            localStorage.removeItem("count")     
                         swal({
                             title: "Thanh toán!",
                             text: "Thành công, chọn mục tiệc cưới để xem chi tiết!",
                             icon: "success",
                             button: "Đồng ý",
-                        })
+                        }).then(() => window.location.reload())
                     } catch(ex) {
                         console.error(ex)
                         swal({
@@ -228,7 +168,7 @@ export default function CreateWedding(){
             }
             else
             {
-                if(window.confirm("Đăng nhập để thực hiện thanh toán?")==true)
+                if(window.confirm("Đăng nhập để thực hiện thanh toán?")===true)
                     window.location.href= "/login"
                 else{
                     swal({
@@ -241,6 +181,7 @@ export default function CreateWedding(){
             }
         }
     }
+   
     return(
         <Container>
             <h1 className="text-center text-danger">ĐẶT TIỆC</h1>
@@ -288,7 +229,7 @@ export default function CreateWedding(){
                     <Col>
                     <h5 className="text-danger">Tổng tiền:{" "}
                         <label><CurrencyFormat 
-                        value={weddinghallPrice+menuPrice+servicePrice}
+                        value={totalPrice}
                         displayType={'text'} 
                         thousandSeparator={true} 
                         prefix={'₫'}/></label>

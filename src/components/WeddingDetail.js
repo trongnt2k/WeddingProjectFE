@@ -33,7 +33,7 @@ export default function WeddingDetail(){
 
     const addComment = async(event) => {
         event.preventDefault()
-        if(window.confirm("Bạn muốn thực hiện đăng bình luận?") == true){
+        if(window.confirm("Bạn muốn thực hiện đăng bình luận?") === true){
             try{
                 let addCommentRes = await APIS.post(endpoints['add-comment'](weddingId), {
                     "content": addCommentContent
@@ -48,14 +48,14 @@ export default function WeddingDetail(){
                 setCommentContent(comments)
             } catch(ex) {
                 console.error(ex)
-                if(window.confirm("Đăng nhập để thực hiện bình luận?") == true)
+                if(window.confirm("Đăng nhập để thực hiện bình luận?") === true)
                     history.push("/login")
             } 
         }
     }
 
     const rating = async(r) => {
-        if(window.confirm("Bạn muốn thực hiện đánh giá ?") == true) {
+        if(window.confirm("Bạn muốn thực hiện đánh giá ?") === true) {
             try{
                 let ratingRes = await APIS.post(endpoints['rating'](weddingId), {
                     "rate": r
@@ -67,7 +67,7 @@ export default function WeddingDetail(){
                 swal("Đánh giá thành công!")
             } catch(ex) {
                 console.error(ex)
-                if(window.confirm("Đăng nhập để thực hiện đánh giá?") == true)
+                if(window.confirm("Đăng nhập để thực hiện đánh giá?") === true)
                     history.push("/login")
             }
         }

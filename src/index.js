@@ -7,13 +7,16 @@ import { createStore } from 'redux'
 import mainReducer from './reducers/RootReducer'
 import { Provider } from 'react-redux';
 import '../node_modules/font-awesome/css/font-awesome.min.css'; 
+import CartProvider from './CartProvider/CartProvider';
 
 const store = createStore(mainReducer)
 
 ReactDOM.render(
+  <CartProvider>
   <Provider store={store}>
     <Body />
-  </Provider>,
+  </Provider>
+  </CartProvider>,
   document.getElementById('root')
 );
 

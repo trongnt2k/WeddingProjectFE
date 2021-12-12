@@ -10,6 +10,7 @@
     "bootstrap": "^5.1.1",
     "font-awesome": "^4.7.0",
     "js-cookie": "^3.0.1",
+    "lodash.isequal": "^4.5.0",
     "mdbreact": "^5.1.0",
     "moment": "^2.29.1",
     "rating": "^0.1.0",
